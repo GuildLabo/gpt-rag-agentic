@@ -128,6 +128,7 @@ class BaseAgentStrategy:
                 "Please summarize the following conversation, highlighting the main topics discussed, the specific subject "
                 "if mentioned, any decisions made, questions raised, and any unresolved issues or actions pending. "
                 "If there is a document or object mentioned with an identifying number, include that information for future reference. "
+                "If the last message in the conversation is an agent asking the user for clarification, leave the last raw conversation history of both sides as is. "
                 f"Conversation history: \n{history}"
             )
             conversation_summary = aoai.get_completion(prompt)
