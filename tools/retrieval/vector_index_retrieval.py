@@ -98,3 +98,50 @@ def vector_index_retrieve(
     sources =  ' '.join(search_results)
     return sources
 
+
+def cogmo_search(
+    input: Annotated[str, "An optimized query string based on the user's ask and conversation history, when available"]
+) -> Annotated[str, "The output is a string with the search results"]:
+    """
+    instead of using the AzureOpenAIClient, we can use the GET request to the cogmo search API:
+    https://search.cogmo.jp/api/v3/{COGMO_ID}/collection
+    
+    The search query is the input parameter
+    """
+
+    search_top_k = os.getenv('AZURE_SEARCH_TOP_K', 3)
+    cogmo_id = os.getenv('COGMO_ID', '')
+
+    search_results = []
+    search_query = input
+    
+    try:
+        start_time = time.time()
+        logging.info(f"[ai_search] querying cogmo search. search query: {search_query}")
+        search_endpoint = f"https://search.cogmo.jp/api/v3/{cogmo_id}/collection"
+        response = requests.get(search_endpoint, params={"query": search_query})
+        status_code = response.status_code
+        text = response.text
+        json = response.json()    
+        if status_code >= 400:
+            error_message = f'Status code: {status_code}.'
+            if text != "":
+                error_message += f" Error: {text}."
+            logging.error(f"[ai_search] error {status_code} when searching documents. {error_message}")
+        else:
+            if json['response']['docs']:
+                logging.info(f"[ai_search] {len(json['response']['docs'])} documents retrieved")
+                for doc in json['response']['docs'][0:int(search_top_k)]:
+                    search_results.append(doc['title'] + ": " + doc['highlighting'].strip() + "\n")
+            else:
+                logging.info(f"[ai_search] No documents retrieved")
+
+        response_time = round(time.time() - start_time, 2)
+        logging.info(f"[ai_search] finished querying cogmo search. {response_time} seconds")
+    
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"[ai_search] error when getting the answer {error_message}")
+    
+    sources =  ' '.join(search_results)
+    return sources

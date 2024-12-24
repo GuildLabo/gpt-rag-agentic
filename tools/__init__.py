@@ -1,4 +1,4 @@
-from .retrieval.vector_index_retrieval import vector_index_retrieve
+from .retrieval.vector_index_retrieval import vector_index_retrieve, cogmo_search
 from .retrieval.queries_retrieval import queries_retrieval
 from .retrieval.tables_retrieval import tables_retrieval
 from .retrieval.columns_retrieval import columns_retrieval

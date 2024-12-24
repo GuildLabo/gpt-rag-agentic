@@ -1,7 +1,7 @@
 import logging
 
 from autogen import UserProxyAgent, AssistantAgent, register_function
-from tools import vector_index_retrieve, get_today_date, get_time
+from tools import vector_index_retrieve, cogmo_search, get_today_date, get_time
 
 from .base_agent_strategy import BaseAgentStrategy
 from ..constants import CLASSIC_RAG
@@ -65,7 +65,7 @@ class ClassicRAGAgentStrategy(BaseAgentStrategy):
 
         # Register functions
         register_function(
-            vector_index_retrieve,
+            cogmo_search,
             caller=assistant,
             executor=user_proxy,
             name="vector_index_retrieve", 
